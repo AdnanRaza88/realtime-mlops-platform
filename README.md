@@ -1,104 +1,105 @@
 # Realtime MLOps Platform
 
-Complete real-time data science and MLOps pipeline covering streaming ingestion, feature engineering, model training, model registry, automated retraining, and production monitoring.
+End-to-end real-time data science and MLOps system: streaming ingestion, feature store, training, model registry, automated retraining, drift detection, and a light-theme monitoring dashboard.
 
-**Repository:** https://github.com/AdnanRaza88/realtime-mlops-platform  
+**Repo:** https://github.com/AdnanRaza88/realtime-mlops-platform
+
+**Figma:** https://www.figma.com/design/0KfsVcmjZeh7Fm9Dkg6yud/Realtime-MLOps-Platform---Monitoring-Dashboard
 
 ---
 
 ## Design
 
-**Figma Design File**  
-https://www.figma.com/design/0KfsVcmjZeh7Fm9Dkg6yud/Realtime-MLOps-Platform---Monitoring-Dashboard
+Light theme only. Soft neutrals. Glassmorphism panels. Claymorphism cards. No dark mode.
 
-### Design Pages
-
-| Page | Description |
-|------|-------------|
-| **01 – Overview Dashboard** | Primary operational home with KPI cards (claymorphism), performance chart panel (glassmorphism), recent events, and pipeline health status. |
-| **02 – Drift Detection** | Feature-level drift monitoring with summary KPIs and detailed PSI / status table. |
-| **03 – Model Registry** | Model cards showing version, stage, accuracy, and last update. |
-
-**Visual language**  
-- Light theme only (no dark mode)  
-- Soft neutral palette: off-white base (`#F7F7F5`), pure white surfaces, near-black text, muted slate accent  
-- Glassmorphism for secondary panels (blur + translucency)  
-- Claymorphism for primary cards (soft dual shadows)  
-- No high-saturation or “AI-feel” colors  
-
-Full design tokens and interaction notes are in [`docs/monitoring_dashboard_specs.md`](docs/monitoring_dashboard_specs.md).
+| Page | Role |
+|------|------|
+| Overview | KPIs, performance chart, events, pipeline health |
+| Drift | PSI table and feature status |
+| Models | Registry cards, stage, retrain trigger |
 
 ---
 
-## Planning Documents
-
-All planning and schema documents live inside the repository:
-
-| Document | Path |
-|----------|------|
-| Product Requirements Document | [docs/PRD.md](docs/PRD.md) |
-| Feature Store Schema | [docs/feature_store_schema.md](docs/feature_store_schema.md) |
-| Drift Detection Strategy | [docs/drift_detection_strategy.md](docs/drift_detection_strategy.md) |
-| Model Registry Design | [docs/model_registry_design.md](docs/model_registry_design.md) |
-| Monitoring Dashboard Specs | [docs/monitoring_dashboard_specs.md](docs/monitoring_dashboard_specs.md) |
-| Document Tracker | [docs/document_tracker.md](docs/document_tracker.md) |
-| Validation Report | [docs/validation_report.md](docs/validation_report.md) |
-
----
-
-## Architecture Components
+## Layout
 
 ```
-src/
-├── ingestion/          # Streaming consumers (Kafka-compatible)
-├── feature_engineering/# Online + offline feature service
-├── training/           # Reproducible training entry points
-├── registry/           # Model versioning & stage transitions
-├── retraining/         # Automated triggers (schedule / drift / performance)
-├── monitoring/         # Drift detection (PSI and related metrics)
-└── common/             # Config, logging
-```
+backend/                 FastAPI service
+  app/
+    api/routes.py
+    core/config.py
+    models/schemas.py
+    services/
+      drift.py           PSI + status classification
+      registry.py        version + stage transitions
+      retraining.py      schedule / performance / drift triggers
+      overview.py
+    main.py
 
-```
-frontend/               # Light-theme React dashboard
-infrastructure/         # Docker, Kubernetes, Terraform stubs
-configs/                # Environment and pipeline configs
+frontend/                Static HTML/CSS/JS (GitHub Pages ready)
+  index.html
+  css/styles.css
+  js/api.js              API client + offline mock fallback
+  js/app.js
+
+docs/                    PRD, schemas, strategies
+src/                     Library modules (ingestion, training, etc.)
+.github/workflows/pages.yml
 ```
 
 ---
 
-## Quick Start
-
-### Backend (Python)
+## Backend
 
 ```bash
+cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+export PYTHONPATH=.
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### Frontend
+Or: `./scripts/run_backend.sh`
+
+API base: `http://127.0.0.1:8000/api/v1`
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | /health | liveness |
+| GET | /overview | KPIs, stages, events, series |
+| GET | /drift | feature PSI results |
+| GET | /models | registry list |
+| POST | /models/{name}/versions/{version}/transition | stage change |
+| POST | /retrain | queue retrain |
+| GET | /retrain/history | recent triggers |
+
+OpenAPI: http://127.0.0.1:8000/docs
+
+---
+
+## Frontend
 
 ```bash
 cd frontend
-npm install
-npm run dev
+python -m http.server 5173
 ```
 
-Dashboard runs at http://localhost:5173 with the soft light theme matching the Figma designs.
+Visit http://127.0.0.1:5173
+
+Dashboard uses `window.MLOpsConfig.apiBase` (default local API). Falls back to mock data when API is offline so GitHub Pages still works.
 
 ---
 
-## Key Design Decisions
+## GitHub Pages
 
-- Dual feature store (online low-latency + offline point-in-time correct).
-- Stage-based model lifecycle (`Development → Staging → Production → Archived`).
-- Drift detection centered on PSI with configurable warning/critical thresholds.
-- Retraining triggered by schedule, performance drop, or feature drift.
-- Dashboard deliberately calm and professional for long operational use.
+Workflow deploys `frontend/` on push to main.
+
+Enable: Settings → Pages → Source: GitHub Actions
+
+URL: https://adnanraza88.github.io/realtime-mlops-platform/
 
 ---
 
-## License
+## Planning docs
 
-MIT (or company-internal as applicable).
+See `docs/` for PRD, feature store schema, drift strategy, model registry, dashboard specs, tracker, validation report.

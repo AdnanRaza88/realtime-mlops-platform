@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realtime MLOps Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script>
+    window.MLOpsConfig = {
+      apiBase: "http://127.0.0.1:8000/api/v1"
+    };
+  </script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">MLOps Platform</div>
+      <nav class="nav">
+        <a href="#" data-page="overview" class="active">Overview</a>
+        <a href="#" data-page="models">Models</a>
+        <a href="#" data-page="drift">Drift</a>
+        <a href="#" data-page="pipelines">Pipelines</a>
+        <a href="#" data-page="alerts">Alerts</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <header class="header">
+        <h1 id="page-title">Real-time Monitoring Overview</h1>
+        <span id="api-badge" class="api-badge">Connecting…</span>
+      </header>
+      <div class="content">
+        <section id="page-overview" class="page visible">
+          <div class="kpi-row">
+            <div class="clay-card"><h3>Active Models</h3><div class="value" id="kpi-models">—</div><div class="delta" id="kpi-models-d"></div></div>
+            <div class="clay-card"><h3>Avg Latency</h3><div class="value" id="kpi-latency">—</div><div class="delta" id="kpi-latency-d"></div></div>
+            <div class="clay-card"><h3>Drift Alerts</h3><div class="value" id="kpi-drift">—</div><div class="delta" id="kpi-drift-d"></div></div>
+            <div class="clay-card"><h3>Throughput</h3><div class="value" id="kpi-throughput">—</div><div class="delta" id="kpi-throughput-d"></div></div>
+          </div>
+          <div class="grid-9-3">
+            <div class="glass-panel"><h3>Model Performance (Last 24h)</h3><div class="chart-area"><canvas id="perf-chart"></canvas></div></div>
+            <div class="glass-panel"><h3>Recent Events</h3><ul class="event-list" id="event-list"></ul></div>
+          </div>
+          <div class="clay-card"><h3 style="font-size:15px;font-weight:600;color:var(--text)">Pipeline Health</h3><div class="pipeline-row" id="pipeline-stages"></div></div>
+        </section>
+        <section id="page-drift" class="page">
+          <div class="kpi-row">
+            <div class="clay-card"><h3>Features Monitored</h3><div class="value" id="drift-monitored">—</div></div>
+            <div class="clay-card"><h3>Drift Detected</h3><div class="value" id="drift-count">—</div></div>
+            <div class="clay-card"><h3>PSI Threshold</h3><div class="value" id="drift-threshold">—</div></div>
+            <div class="clay-card"><h3>Last Check</h3><div class="value" id="drift-last" style="font-size:22px">—</div></div>
+          </div>
+          <div class="glass-panel"><h3>Feature Drift Details (PSI)</h3><div class="table-wrap"><table><thead><tr><th>Feature</th><th>Type</th><th>PSI</th><th>Status</th><th>Last Updated</th></tr></thead><tbody id="drift-body"></tbody></table></div></div>
+        </section>
+        <section id="page-models" class="page"><div class="models-grid" id="models-grid"></div></section>
+        <section id="page-pipelines" class="page"><div class="glass-panel"><h3>Recent pipeline runs</h3><p class="empty">Connect the backend to view live pipeline history.</p></div></section>
+        <section id="page-alerts" class="page"><div class="glass-panel"><h3>Active alerts</h3><p class="empty">No active alerts when API is offline. Drift alerts appear on the Drift page.</p></div></section>
+      </div>
+    </div>
+  </div>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
